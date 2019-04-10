@@ -1,3 +1,7 @@
+"""
+flask mailroom
+"""
+
 import os
 import base64
 
@@ -15,9 +19,20 @@ def home():
 def all():
     donations = Donation.select()
     return render_template('donations.jinja2', donations=donations)
-    
+
+
+@app.route('/create', methods=['GET', 'POST'])
+def create():
+    #peewee.IntegrityError: NOT NULL constraint failed: donation.donor_id
+    if request.method == 'POST':
+        Donation(name=request.form['name'], value=request.form['amount']).save()
+        return redirect(url_for('all'))
+    else:
+        return render_template('create.jinja2')
+
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 6738))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='localhost', port=port)
 
