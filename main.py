@@ -7,7 +7,7 @@ import base64
 
 from flask import Flask, render_template, request, redirect, url_for, session
 
-from model import Donation 
+from model import Donor, Donation 
 
 app = Flask(__name__)
 
@@ -24,8 +24,13 @@ def all():
 @app.route('/create', methods=['GET', 'POST'])
 def create():
     #peewee.IntegrityError: NOT NULL constraint failed: donation.donor_id
+    
     if request.method == 'POST':
-        Donation(name=request.form['name'], value=request.form['amount']).save()
+        donor = Donor(Donor.select().where(Donor.name == request.form['name'])).get()
+        #id, a pointer to the data set.
+        print(donor)
+        print(donor.name)
+        Donation.create(donor=donor, value=request.form['amount'])
         return redirect(url_for('all'))
     else:
         return render_template('create.jinja2')
